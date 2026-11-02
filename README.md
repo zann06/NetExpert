@@ -1,5 +1,6 @@
 # NetExpert — Internet Troubleshooting Expert System
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-netexpert.streamlit.app-16A34A?logo=streamlit&logoColor=white)](https://netexpert.streamlit.app/)
 [![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=zann06/NetExpert&branch=main&mainModule=app.py)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-2563EB)](https://www.python.org/)
 [![Tests](https://img.shields.io/badge/tests-73%20passed-16A34A)](tests/)
@@ -7,6 +8,8 @@
 NetExpert adalah aplikasi web edukasi untuk mensimulasikan **sistem pakar berbasis aturan produksi IF–THEN** dalam mendiagnosis gangguan internet. Aplikasi ini tidak sekadar menampilkan kesimpulan: seluruh proses penalaran — evaluasi TRUE/FALSE setiap kondisi, conflict set, conflict resolution, refractoriness, dan pohon inferensi — dapat diaudit langkah demi langkah.
 
 Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepenuhnya dari UI dan tidak menggunakan LLM atau API AI eksternal. Semua keputusan inferensi bersifat deterministik.
+
+**Live demo:** <https://netexpert.streamlit.app/>
 
 ---
 
@@ -352,6 +355,10 @@ Cakupan pengujian:
 ## 12. Deploy ke Streamlit Community Cloud
 
 Aplikasi siap di-deploy tanpa konfigurasi tambahan: entry point `app.py`, dependensi di `requirements.txt`, dan tema di `.streamlit/config.toml`.
+
+**Live app:** <https://netexpert.streamlit.app/> — sudah ter-deploy dari branch `main`.
+
+Untuk men-deploy ulang atau membuat instance baru:
 
 1. Buka <https://share.streamlit.io> dan login dengan akun GitHub.
 2. Pilih **Create app** → **Deploy a public app from GitHub**.
