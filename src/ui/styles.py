@@ -29,6 +29,21 @@ CSS = """
 html, body, [class*="st-"], .stApp, button, input, textarea, select {
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
 }
+/* The Inter rule above also matches Streamlit's emotion classes on icon
+   spans, which turns Material ligatures (e.g. "keyboard_arrow_right") into
+   literal text.  Restore the icon font with higher specificity. */
+html body [data-testid="stIconMaterial"] {
+  font-family: 'Material Symbols Rounded' !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  direction: ltr !important;
+  font-feature-settings: 'liga' !important;
+  -webkit-font-feature-settings: 'liga' !important;
+  -webkit-font-smoothing: antialiased !important;
+}
 
 .stApp { background: var(--background); }
 /* Solid header: content scrolls underneath it, but the first screen starts below it. */
