@@ -58,7 +58,7 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 
 ---
 
-## 2. Dataset Default (sesuai tugas)
+## 2. Dataset Default 
 
 ### Aturan produksi
 
