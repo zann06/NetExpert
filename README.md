@@ -108,7 +108,7 @@ Alternatif R2 dan R3 ditampilkan sebagai cabang **UNPROVEN**.
 
 Inference engine tidak mengimpor Streamlit. Tree renderer hanya mengonsumsi trace terstruktur dan tidak menjalankan ulang logika inferensi.
 
-> Streamlit merender Graphviz menggunakan Graphviz WebAssembly di browser, sehingga **binary `dot` tidak wajib terinstal** di sistem. Paket Python `graphviz` disertakan untuk kebutuhan tooling/ekspor DOT.
+> Streamlit merender Graphviz menggunakan Graphviz WebAssembly di browser, sehingga **binary `dot` tidak wajib terinstal** di sistem. Ekspor `.dot` dihasilkan langsung dari string DOT yang sama, tanpa paket Python tambahan.
 
 ---
 
