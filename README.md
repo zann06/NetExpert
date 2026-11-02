@@ -330,23 +330,5 @@ Cakupan pengujian:
 - Validasi rule, ID duplikat, CRUD knowledge base.
 - Konsistensi trace dengan inference tree dan filter tree.
 
----
 
-## 10. Catatan Desain
-
-- **White-first**: latar putih, panel sekunder `#F8FAFC`, border halus `#E2E8F0`.
-- **Aksen utama**: biru `#2563EB` digunakan terbatas pada aksi dan informasi aktif.
-- **Semantik warna**: hijau `#16A34A`, merah `#DC2626`, amber `#D97706`, abu-abu `#64748B`.
-- Warna tidak pernah menjadi satu-satunya pembeda — selalu ada label teks.
-- Tidak ada gradient berlebihan, neon, glassmorphism, atau emoji dekoratif.
-
----
-
-## 11. Batasan yang Diketahui
-
-- Semua kondisi dalam satu aturan menggunakan **AND**; OR tidak didukung karena tidak diminta oleh tugas.
-- Pencocokan fakta bersifat **exact setelah normalisasi** (bukan fuzzy/NLP).
-- `st.graphviz_chart` menampilkan graph interaktif (pan/zoom tergantung browser) tetapi tidak mengirim event klik node; detail node disediakan melalui inspector dan tabel di bawah graph.
-- State aplikasi disimpan di session Streamlit dan akan kembali ke dataset default saat server di-restart.
-- Hasil diagnosis hanya berdasarkan fakta dan aturan yang dimasukkan; bukan pemindaian jaringan nyata.
 
