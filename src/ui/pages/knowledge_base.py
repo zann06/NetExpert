@@ -6,7 +6,7 @@ from typing import List
 
 import streamlit as st
 
-from ...models import Rule, salience_label
+from ...models import SUPPORTED_CONNECTORS, Rule, salience_label
 from .. import components as c
 from ..state import get_kb, get_rules, store_kb
 
@@ -35,6 +35,7 @@ def _add_rule_callback() -> None:
         conditions=_split_conditions(st.session_state.get("add_conditions", "")),
         conclusion=st.session_state.get("add_conclusion", ""),
         salience=st.session_state.get("add_salience", 1),
+        connector=st.session_state.get("add_connector", "AND"),
     )
     kb = get_kb()
     errors = kb.add(rule)
@@ -49,6 +50,7 @@ def _add_rule_callback() -> None:
     st.session_state.add_conditions = ""
     st.session_state.add_conclusion = ""
     st.session_state.add_salience = 2
+    st.session_state.add_connector = "AND"
 
 
 def _update_rule_callback(original_id: str) -> None:
@@ -59,6 +61,7 @@ def _update_rule_callback(original_id: str) -> None:
         ),
         conclusion=st.session_state.get(f"edit_concl_{original_id}", ""),
         salience=st.session_state.get(f"edit_sal_{original_id}", 1),
+        connector=st.session_state.get(f"edit_conn_{original_id}", "AND"),
     )
     kb = get_kb()
     errors = kb.update(original_id, rule)
@@ -91,7 +94,7 @@ def render() -> None:
     c.page_head(
         "Knowledge Base",
         "Kelola aturan produksi IF–THEN. Beberapa kondisi dalam satu aturan "
-        "dihubungkan dengan logika AND.",
+        "dapat dihubungkan dengan logika AND atau OR.",
     )
 
     _render_flash()
@@ -121,7 +124,8 @@ def _render_info_cards() -> None:
         '<div class="nx-card-title">Konvensi basis pengetahuan</div>'
         '<div class="nx-card-sub">'
         "Setiap aturan memiliki satu ID unik, minimal satu kondisi IF, satu kesimpulan THEN, "
-        "dan salience 1–4. Spesifisitas dihitung otomatis dari jumlah kondisi IF."
+        "salience 1–4, dan operator AND atau OR. Spesifisitas dihitung otomatis "
+        "dari jumlah kondisi IF."
         "</div>"
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.25rem">'
         '<span class="nx-chip amber">1 — Rendah</span>'
@@ -169,7 +173,7 @@ def _render_rule_list() -> None:
 def _render_add_form() -> None:
     c.section_title(
         "Tambah aturan produksi",
-        "Tulis satu kondisi per baris. Semua baris digabung dengan AND.",
+        "Tulis satu kondisi per baris, lalu pilih operator AND atau OR.",
     )
 
     errors = st.session_state.get("add_errors")
@@ -187,6 +191,8 @@ def _render_add_form() -> None:
         ss.add_conclusion = ""
     if "add_salience" not in ss:
         ss.add_salience = 2
+    if "add_connector" not in ss:
+        ss.add_connector = "AND"
 
     with st.form("add_rule_form"):
         st.text_input("ID Aturan", key="add_id")
@@ -195,6 +201,11 @@ def _render_add_form() -> None:
             key="add_conditions",
             placeholder="Semua Situs Tidak Bisa Dibuka\nHanya Laptop Ini Bermasalah",
             height=120,
+        )
+        st.selectbox(
+            "Operator kondisi",
+            options=list(SUPPORTED_CONNECTORS),
+            key="add_connector",
         )
         st.text_input(
             "Kesimpulan THEN",
@@ -247,7 +258,8 @@ def _render_edit_panel() -> None:
         '<div class="nx-card" style="background:#F8FAFC">'
         f'<div class="nx-kv">ID <b>{c.esc(rule.id)}</b> · '
         f'Salience <b>{rule.salience} ({c.esc(salience_label(rule.salience))})</b> · '
-        f"Spesifisitas <b>{rule.specificity} kondisi</b></div>"
+        f"Spesifisitas <b>{rule.specificity} kondisi</b> · "
+        f"Operator <b>{c.esc(rule.connector)}</b></div>"
         "</div>"
     )
 
@@ -259,6 +271,14 @@ def _render_edit_panel() -> None:
             value="\n".join(rule.conditions),
             key=f"edit_cond_{selected_id}",
             height=120,
+        )
+        st.selectbox(
+            "Operator kondisi",
+            options=list(SUPPORTED_CONNECTORS),
+            index=list(SUPPORTED_CONNECTORS).index(rule.connector)
+            if rule.connector in SUPPORTED_CONNECTORS
+            else 0,
+            key=f"edit_conn_{selected_id}",
         )
         conclusion = st.text_input(
             "Kesimpulan THEN",

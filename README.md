@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-netexpert.streamlit.app-16A34A?logo=streamlit&logoColor=white)](https://netexpert.streamlit.app/)
 [![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=zann06/NetExpert&branch=main&mainModule=app.py)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-2563EB)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-73%20passed-16A34A)](tests/)
+[![Tests](https://img.shields.io/badge/tests-102%20passed-16A34A)](tests/)
 
 NetExpert adalah aplikasi web edukasi untuk mensimulasikan **sistem pakar berbasis aturan produksi IF–THEN**. Aplikasi ini tidak sekadar menampilkan kesimpulan: seluruh proses penalaran — evaluasi TRUE/FALSE setiap kondisi, conflict set, conflict resolution, refractoriness, dan pohon inferensi — dapat diaudit langkah demi langkah.
 
@@ -18,6 +18,7 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 ### Inference engine
 - **Forward Chaining** (data-driven) dengan evaluasi seluruh kondisi IF pada setiap iterasi.
 - **Backward Chaining** (goal-driven) dengan subgoal rekursif, pencatatan cabang gagal, dan deteksi siklus.
+- **Operator AND/OR pada level aturan**: aturan AND membutuhkan semua kondisi TRUE, aturan OR cukup satu kondisi TRUE. Dataset tugas tetap memakai AND sehingga perilakunya tidak berubah.
 - **Conflict resolution** tiga tingkat: `salience` → `spesifisitas` → `nomor aturan` (numerik, sehingga R2 sebelum R10).
 - **Refractoriness**: setiap aturan hanya dapat fired sekali dalam satu eksekusi.
 - **Duplicate conclusion handling**: kesimpulan yang sudah ada tidak diduplikasi, tetapi firing tetap dicatat.
@@ -25,22 +26,26 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 
 ### Transparansi penalaran
 - Setiap kondisi IF memiliki label eksplisit **TRUE** atau **FALSE**.
-- Perbedaan tegas antara **NOT READY** (ada kondisi FALSE) dan **READY BUT NOT SELECTED** (kalah conflict resolution).
+- Aturan **AND** dan **OR** sama-sama menampilkan status setiap kondisi, termasuk kondisi yang tidak menentukan hasil OR.
+- Perbedaan tegas antara **NOT READY** (kondisi tidak memenuhi operator) dan **READY BUT NOT SELECTED** (kalah conflict resolution).
 - Status **REFRACTORY** ditampilkan pada iterasi berikutnya.
 - Iteration log lengkap: snapshot working memory, ranking conflict set, aturan terpilih, alasan pemilihan, kesimpulan, dan working memory setelah firing.
 - Cabang yang gagal tetap terlihat, tidak disembunyikan.
 
 ### Visualisasi
 - Inference tree dibangun **dinamis dari trace eksekusi** (bukan ilustrasi statis).
-- Graphviz DOT dirender melalui `st.graphviz_chart`.
+- **Graph interaktif yang dapat diklik** (`st-link-analysis` / Cytoscape): klik node untuk melihat detail evaluasi, kondisi, kesimpulan, atau cabang pembuktian langsung di bawah graph.
+- Forward chaining ditampilkan **satu iterasi pada satu waktu** melalui selector agar graph tetap terbaca.
+- Tersedia tab **Graph statis (DOT)** berbasis Graphviz untuk tampilan seluruh iterasi, pan/zoom, dan ekspor `.dot`.
 - Pengelompokan per iterasi, label TRUE/FALSE pada edge dan node, legenda permanen.
-- Filter: semua evaluasi, hanya FIRED, kondisi gagal, READY BUT NOT SELECTED.
-- Tabel alternatif yang aksesibel dan inspector node untuk melihat detail evaluasi.
+- Filter pada graph statis: semua evaluasi, hanya FIRED, kondisi gagal, READY BUT NOT SELECTED.
+- Tabel alternatif yang aksesibel dan inspector node tetap tersedia sebagai fallback teks.
 - Unduh graph dalam format `.dot`.
 
 ### Manajemen pengetahuan
 - CRUD aturan produksi: tambah, edit ID/kondisi/kesimpulan/salience, hapus dengan konfirmasi.
-- Validasi: ID unik, minimal satu kondisi, kesimpulan tidak kosong, salience 1–4.
+- **Pemilihan operator AND atau OR** saat menambah/mengedit aturan.
+- Validasi: ID unik, minimal satu kondisi, kesimpulan tidak kosong, salience 1–4, operator AND/OR.
 - Pencarian dan filter berdasarkan teks/salience.
 - Manajemen fakta awal: pilih dari katalog, tambah fakta manual, hapus, kosongkan, atau muat ulang fakta default.
 - Reset seluruh aplikasi ke dataset tugas.
@@ -57,7 +62,7 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 
 ### Aturan produksi
 
-| ID | IF (semua kondisi AND) | THEN | Salience |
+| ID | IF (operator AND) | THEN | Salience |
 |---|---|---|---:|
 | R1 | Semua Situs Tidak Bisa Dibuka | Cek Router | 1 |
 | R2 | Lampu Internet Router Merah | Gangguan Provider | 2 |
@@ -69,6 +74,8 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 | R8 | Cek Router AND Router Terasa Panas | Matikan Router 10 Menit | 4 |
 
 Salience: **1 = Rendah**, **2 = Sedang**, **3 = Tinggi**, **4 = Tertinggi**.
+
+Kedelapan aturan default memakai operator **AND** agar sesuai tugas. Operator **OR** dapat dipilih untuk aturan baru melalui halaman Knowledge Base, misalnya `Lampu Internet Router Merah OR Kecepatan Sangat Lambat → Gangguan Provider`. Spesifisitas tetap dihitung dari jumlah kondisi, terlepas dari operatornya.
 
 ### Fakta awal
 1. Semua Situs Tidak Bisa Dibuka
@@ -105,7 +112,8 @@ Alternatif R2 dan R3 ditampilkan sebagai cabang **UNPROVEN**.
 |---|---|
 | Bahasa | Python 3.10+ |
 | Web UI | Streamlit |
-| Visualisasi tree | Graphviz DOT via `st.graphviz_chart` |
+| Graph interaktif | `st-link-analysis` (Cytoscape.js) |
+| Graph statis | Graphviz DOT via `st.graphviz_chart` |
 | Testing | Pytest |
 | Data model | Python dataclasses |
 
@@ -142,7 +150,8 @@ NetExpert_Documentation/
 │   │   └── backward_chaining.py
 │   ├── visualization/
 │   │   ├── __init__.py
-│   │   └── inference_tree.py       # Dynamic DOT + accessible tables
+│   │   ├── inference_tree.py       # Dynamic DOT + accessible tables
+│   │   └── interactive_graph.py    # Clickable Cytoscape elements + styles
 │   └── ui/
 │       ├── __init__.py
 │       ├── styles.py               # Global white-first CSS
@@ -162,7 +171,9 @@ NetExpert_Documentation/
     ├── test_conflict_resolution.py
     ├── test_forward_chaining.py
     ├── test_backward_chaining.py
-    └── test_tree.py
+    ├── test_tree.py
+    ├── test_or_rules.py
+    └── test_interactive_graph.py
 ```
 
 ---
@@ -237,9 +248,13 @@ Urutan firing **R5 → R4 → R1 → R7**, empat fakta turunan, dan ringkasan it
 
 ### 7.4 Pohon Inferensi Forward
 
-Pohon dibangun dari trace eksekusi. Setiap kondisi berlabel TRUE/FALSE, cabang gagal tetap terlihat, dan tersedia filter evaluasi serta unduhan `.dot`.
+Pohon dibangun dari trace eksekusi. Tab **Graph interaktif** menampilkan satu iterasi pada satu waktu dan mengirim event klik node; detail node muncul di bawah graph. Tab **Graph statis (DOT)** menampilkan seluruh iterasi, filter evaluasi, dan unduhan `.dot`. Setiap kondisi berlabel TRUE/FALSE dan cabang gagal tetap terlihat.
 
 ![Pohon inferensi forward](assets/screenshots/04-forward-tree.png)
+
+Tab statis menampilkan seluruh iterasi sekaligus, lengkap dengan filter evaluasi dan ekspor `.dot`:
+
+![Graph statis forward](assets/screenshots/04b-forward-tree-static.png)
 
 ### 7.5 Backward Chaining
 
@@ -249,13 +264,17 @@ Goal `Lapor ke Provider` berhasil dibuktikan melalui **R5 → R4**. Cabang alter
 
 ### 7.6 Pohon Inferensi Backward
 
-Visualisasi goal, rule, dan fakta pendukung beserta status PROVEN/UNPROVEN.
+Visualisasi goal, rule, dan fakta pendukung beserta status PROVEN/UNPROVEN. Graph interaktif menampilkan seluruh pohon pembuktian dan detail node saat diklik; edge diberi label operator AND/OR.
 
 ![Pohon inferensi backward](assets/screenshots/08-backward-tree.png)
 
+Tampilan statis (DOT) untuk seluruh pohon pembuktian:
+
+![Graph statis backward](assets/screenshots/08b-backward-tree-static.png)
+
 ### 7.7 Knowledge Base
 
-CRUD aturan produksi, validasi ID unik, pencarian, dan filter salience.
+CRUD aturan produksi, validasi ID unik, pemilihan operator AND/OR, pencarian, dan filter salience.
 
 ![Halaman knowledge base](assets/screenshots/05-knowledge-base.png)
 
@@ -300,7 +319,7 @@ Penjelasan konsep forward/backward chaining, conflict resolution, dan refractori
 ### E. Mengelola knowledge base
 1. Buka **Knowledge Base**.
 2. Tab **Daftar Aturan**: cari/filter aturan.
-3. Tab **Tambah Aturan**: isi ID, kondisi (satu per baris = AND), kesimpulan, salience.
+3. Tab **Tambah Aturan**: isi ID, kondisi (satu per baris), pilih operator **AND** atau **OR**, kesimpulan, dan salience.
 4. Tab **Edit / Hapus**: pilih aturan, ubah, simpan, atau hapus dengan konfirmasi.
 
 ### F. Reset
@@ -314,7 +333,7 @@ Gunakan **Reset ke dataset tugas** pada sidebar, centang konfirmasi, lalu tekan 
 python -m pytest -q
 ```
 
-Hasil aktual: **73 passed**.
+Hasil aktual: **102 passed**.
 
 Cakupan pengujian:
 - Default forward chaining dan urutan firing `R5 → R4 → R1 → R7`.
@@ -325,10 +344,10 @@ Cakupan pengujian:
 - Prioritas salience, spesifisitas, dan nomor aturan numerik.
 - Refractoriness.
 - Penanganan kesimpulan duplikat.
+- Semantik aturan **AND** dan **OR** pada forward dan backward chaining.
+- Validasi operator dan penyimpanan connector pada knowledge base.
 - Backward chaining sukses, gagal, dan goal yang sudah menjadi fakta.
 - Deteksi siklus.
 - Validasi rule, ID duplikat, CRUD knowledge base.
-- Konsistensi trace dengan inference tree dan filter tree.
-
-
+- Konsistensi trace dengan inference tree, filter tree, dan adapter graph interaktif.
 

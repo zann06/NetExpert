@@ -180,7 +180,8 @@ def forward_tree_dot(result: ForwardResult, filter_mode: str = FILTER_ALL) -> st
                 f"{evaluation.rule_id} — {evaluation.status.label}\n"
                 f"salience {evaluation.salience} "
                 f"({salience_label(evaluation.salience)}) · "
-                f"{evaluation.specificity} kondisi"
+                f"{evaluation.specificity} kondisi · "
+                f"{evaluation.connector}"
             )
             if evaluation.status == RuleStatus.FIRED:
                 rule_label += "\n→ TERPILIH"
@@ -268,7 +269,8 @@ def _backward_label(node: BackwardNode) -> str:
     if node.kind == "FACT":
         return f"FAKTA\n{node.label}\nTRUE"
     if node.kind == "RULE":
-        return f"{node.label}\n{node.status.value}"
+        connector = f"\noperator {node.connector}" if node.connector else ""
+        return f"{node.label}\n{node.status.value}{connector}"
     return f"{node.label}\n{node.status.value}"
 
 
@@ -300,7 +302,7 @@ def backward_tree_dot(result: BackwardResult) -> str:
             if node.kind == "GOAL" and child.kind == "RULE":
                 edge_label = "kandidat"
             elif node.kind == "RULE":
-                edge_label = "AND"
+                edge_label = node.connector or "AND"
             elif node.kind == "FACT":
                 edge_label = ""
             elif child.status == NodeStatus.PROVEN:
@@ -349,6 +351,7 @@ def forward_condition_rows(result: ForwardResult) -> List[dict]:
                     {
                         "Iterasi": iteration.iteration,
                         "Aturan": evaluation.rule_id,
+                        "Logika": evaluation.connector,
                         "Kondisi": condition.condition,
                         "Status": condition.label,
                         "Status aturan": evaluation.status.label,

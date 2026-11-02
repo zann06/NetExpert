@@ -389,8 +389,9 @@ def _render_failed_branches(result: ForwardResult) -> None:
     ids = ", ".join(ev.rule_id for ev in failed_evaluations)
     with st.expander(f"Cabang gagal — aturan yang tidak pernah fired ({ids})", expanded=False):
         st.caption(
-            "Aturan berikut tidak pernah masuk conflict set karena minimal satu kondisi "
-            "IF bernilai FALSE. Cabang ini tetap disimpan agar penalaran dapat diaudit."
+            "Aturan berikut tidak pernah masuk conflict set karena kondisi IF tidak "
+            "memenuhi operator aturannya (AND/OR). Cabang ini tetap disimpan agar "
+            "penalaran dapat diaudit."
         )
         st.markdown(c.evaluation_cards(failed_evaluations), unsafe_allow_html=True)
 
@@ -407,7 +408,7 @@ def _render_backward_result(result: BackwardResult) -> None:
             "green",
             f"Goal '{result.goal}' PROVEN",
             f"Dibuktikan melalui aturan {result.root.rule_id}. "
-            "Semua kondisi pada jalur bukti terpenuhi.",
+            "Kondisi pada jalur bukti memenuhi operator aturan.",
         )
     else:
         message = "Tidak ada aturan kandidat yang berhasil membuktikan seluruh subgoal."

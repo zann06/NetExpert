@@ -175,6 +175,6 @@ def render() -> None:
     st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
     c.section_title(
         "Knowledge base aktif",
-        "Semua kondisi dalam satu aturan digabung dengan logika AND.",
+        "Setiap aturan memakai satu operator logika (AND atau OR) untuk seluruh kondisinya.",
     )
     c.html_block(c.rules_table(rules))

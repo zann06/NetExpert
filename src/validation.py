@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Iterable, List, Optional
 
-from .models import Rule
+from .models import SUPPORTED_CONNECTORS, Rule
 from .normalization import display, normalize
 
 MIN_SALIENCE = 1
@@ -35,6 +35,13 @@ def validate_condition(condition: str) -> Optional[str]:
 def validate_conclusion(conclusion: str) -> Optional[str]:
     if not display(conclusion):
         return "Kesimpulan (THEN) tidak boleh kosong."
+    return None
+
+
+def validate_connector(connector) -> Optional[str]:
+    """Return an error when the IF connector is not AND/OR."""
+    if str(connector or "").strip().upper() not in SUPPORTED_CONNECTORS:
+        return "Operator kondisi harus AND atau OR."
     return None
 
 
@@ -84,6 +91,10 @@ def validate_rule(
     salience_error = validate_salience(rule.salience)
     if salience_error:
         errors.append(salience_error)
+
+    connector_error = validate_connector(rule.connector)
+    if connector_error:
+        errors.append(connector_error)
 
     return errors
 

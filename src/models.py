@@ -57,17 +57,23 @@ class NodeStatus(str, Enum):
 # ---------------------------------------------------------------------------
 # Knowledge base
 # ---------------------------------------------------------------------------
+SUPPORTED_CONNECTORS = ("AND", "OR")
+
+
 @dataclass
 class Rule:
     """A single IF-THEN production rule.
 
-    Multiple ``conditions`` are joined with logical AND.
+    ``conditions`` are joined with logical ``AND`` or ``OR`` according to
+    ``connector``.  The default is ``AND`` so the assignment dataset keeps its
+    original semantics.
     """
 
     id: str
     conditions: List[str]
     conclusion: str
     salience: int = 1
+    connector: str = "AND"
 
     def __post_init__(self) -> None:
         # Defensive copies / normalization of user supplied values.
@@ -78,6 +84,13 @@ class Rule:
             self.salience = int(self.salience)
         except (TypeError, ValueError):
             self.salience = 0
+        connector = str(self.connector or "AND").strip().upper()
+        self.connector = connector if connector in SUPPORTED_CONNECTORS else "AND"
+
+    @property
+    def joined_conditions(self) -> str:
+        """Human readable condition list using the rule's connector."""
+        return f" {self.connector} ".join(self.conditions)
 
     # -- derived helpers ---------------------------------------------------
     @property
@@ -98,6 +111,7 @@ class Rule:
             "conditions": list(self.conditions),
             "conclusion": self.conclusion,
             "salience": self.salience,
+            "connector": self.connector,
         }
 
     @classmethod
@@ -107,10 +121,17 @@ class Rule:
             conditions=list(data.get("conditions", [])),
             conclusion=data.get("conclusion", ""),
             salience=data.get("salience", 1),
+            connector=data.get("connector", "AND"),
         )
 
     def copy(self) -> "Rule":
-        return Rule(self.id, list(self.conditions), self.conclusion, self.salience)
+        return Rule(
+            self.id,
+            list(self.conditions),
+            self.conclusion,
+            self.salience,
+            self.connector,
+        )
 
 
 SALIENCE_LABELS = {
@@ -153,6 +174,7 @@ class RuleEvaluation:
     salience: int = 0
     specificity: int = 0
     conclusion: str = ""
+    connector: str = "AND"
 
     @property
     def status_label(self) -> str:
@@ -160,6 +182,15 @@ class RuleEvaluation:
 
     @property
     def all_conditions_true(self) -> bool:
+        return all(c.status for c in self.condition_results)
+
+    @property
+    def satisfied(self) -> bool:
+        """Whether the IF side is satisfied under this rule's connector."""
+        if not self.condition_results:
+            return False
+        if self.connector == "OR":
+            return any(c.status for c in self.condition_results)
         return all(c.status for c in self.condition_results)
 
     @property
@@ -225,6 +256,7 @@ class BackwardNode:
     rule_id: Optional[str] = None
     detail: str = ""
     source: str = ""
+    connector: str = ""
     children: List["BackwardNode"] = field(default_factory=list)
 
     @property

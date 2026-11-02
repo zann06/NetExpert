@@ -8,8 +8,8 @@ Algorithm (matches the PRD):
 4.  Rank candidates with the same conflict resolution order.
 5.  Turn each IF condition of a candidate rule into a subgoal.
 6.  Recursively attempt to prove every subgoal.
-7.  If *all* conditions of a candidate rule are proven, that rule proves the
-    goal.
+7.  If the IF side is satisfied (*all* conditions for AND rules, *at least
+    one* for OR rules), that rule proves the goal.
 8.  If every candidate rule fails, the goal is UNPROVEN.
 9.  Successful *and* failed branches are recorded (both stay visible).
 10. Cycles are detected so recursion always terminates.
@@ -110,10 +110,11 @@ class _Prover:
                 kind="RULE",
                 depth=depth + 1,
                 rule_id=rule.id,
+                connector=rule.connector,
                 detail=(
-                    f"IF {' AND '.join(rule.conditions)} THEN {rule.conclusion} "
+                    f"IF {rule.joined_conditions} THEN {rule.conclusion} "
                     f"(salience {rule.salience} / {salience_label(rule.salience)}, "
-                    f"{len(rule.conditions)} kondisi)"
+                    f"{len(rule.conditions)} kondisi, operator {rule.connector})"
                 ),
             )
             if branch is None:
@@ -129,22 +130,31 @@ class _Prover:
                 continue
 
             branch.status = NodeStatus.READY
-            all_proven = True
             for condition in rule.conditions:
                 child = self.prove(condition, next_stack, depth + 2)
                 branch.children.append(child)
-                if child.status != NodeStatus.PROVEN:
-                    all_proven = False
 
-            if all_proven:
+            proven_children = [
+                child for child in branch.children if child.status == NodeStatus.PROVEN
+            ]
+            if rule.connector == "OR":
+                satisfied = bool(proven_children)
+                success_note = "minimal satu kondisi terpenuhi (OR)"
+            else:
+                satisfied = len(proven_children) == len(branch.children)
+                success_note = "semua kondisi terpenuhi (AND)"
+
+            if satisfied:
                 branch.status = NodeStatus.PROVEN
                 self.log.append(
                     f"[PROVEN] '{goal}' dibuktikan melalui {rule.id} "
-                    f"(semua kondisi terpenuhi)."
+                    f"({success_note})."
                 )
             else:
                 branch.status = NodeStatus.UNPROVEN
-                failed = [c.label for c in branch.children if c.status != NodeStatus.PROVEN]
+                failed = [
+                    c.label for c in branch.children if c.status != NodeStatus.PROVEN
+                ]
                 self.log.append(
                     f"[FAILED]  {rule.id} gagal membuktikan '{goal}' "
                     f"(kondisi gagal: {', '.join(failed)})."
@@ -154,7 +164,7 @@ class _Prover:
 
             # Keep the first successful branch as the winning proof path, but
             # continue so alternative (failed) branches stay visible.
-            if all_proven and successful_branch is None:
+            if satisfied and successful_branch is None:
                 successful_branch = branch
 
         if successful_branch is not None:

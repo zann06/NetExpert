@@ -173,6 +173,7 @@ def rules_table(rules: Sequence[Rule], show_actions: bool = False) -> str:
         rows.append(
             "<tr>"
             f'<td><strong>{esc(rule.id)}</strong></td>'
+            f'<td>{chip(rule.connector, "gray", mono=True)}</td>'
             f'<td><ul class="nx-cond-list">{conditions}</ul></td>'
             f'<td>{chip(rule.conclusion, "green")}</td>'
             f'<td class="nx-num">{rule.salience} '
@@ -181,7 +182,7 @@ def rules_table(rules: Sequence[Rule], show_actions: bool = False) -> str:
             "</tr>"
         )
     head = (
-        "<tr><th>ID</th><th>IF (semua AND)</th><th>THEN</th>"
+        "<tr><th>ID</th><th>Logika</th><th>IF</th><th>THEN</th>"
         "<th>Salience</th><th>Spesifisitas</th></tr>"
     )
     return (
@@ -241,7 +242,8 @@ def evaluation_card(evaluation: RuleEvaluation) -> str:
         f"{badge(evaluation.status.label, tone)}"
         f'<span class="nx-eval-meta">salience {evaluation.salience} '
         f'({esc(salience_label(evaluation.salience))}) · '
-        f"{evaluation.specificity} kondisi</span>"
+        f"{evaluation.specificity} kondisi · "
+        f"{esc(evaluation.connector)}</span>"
         "</div>"
         f"{_condition_rows(evaluation.condition_results)}"
         f'<div class="nx-eval-reason">{esc(evaluation.reason)}</div>'

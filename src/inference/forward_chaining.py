@@ -6,7 +6,8 @@ Algorithm (matches the PRD):
 2.  Initialise an empty fired-rules set (refractoriness scope = one run).
 3.  Evaluate every rule that has not fired against the current snapshot.
 4.  Mark each IF condition TRUE / FALSE individually.
-5.  A rule is READY only when *all* conditions are TRUE.
+5.  A rule is READY when its IF side is satisfied: *all* conditions TRUE
+    for AND rules, or *at least one* condition TRUE for OR rules.
 6.  Collect READY rules into the conflict set.
 7.  If the conflict set is empty, terminate.
 8.  Rank the conflict set (salience -> specificity -> numeric rule id).
@@ -52,14 +53,24 @@ def _evaluate_rule(
             ConditionEvaluation(condition=condition, status=ok, explanation=explanation)
         )
 
-    all_true = all(c.status for c in condition_results)
-    if all_true:
-        status = RuleStatus.READY
-        reason = "Semua kondisi IF bernilai TRUE."
+    if rule.connector == "OR":
+        satisfied = any(c.status for c in condition_results)
+        if satisfied:
+            reason = "Minimal satu kondisi IF bernilai TRUE (operator OR)."
+        else:
+            reason = "Semua kondisi IF bernilai FALSE (operator OR)."
     else:
-        missing = ", ".join(c.condition for c in condition_results if not c.status)
-        status = RuleStatus.NOT_READY
-        reason = f"Minimal satu kondisi FALSE — tidak tersedia: {missing}."
+        satisfied = all(c.status for c in condition_results)
+        if satisfied:
+            reason = "Semua kondisi IF bernilai TRUE (operator AND)."
+        else:
+            missing = ", ".join(c.condition for c in condition_results if not c.status)
+            reason = (
+                "Minimal satu kondisi FALSE (operator AND) — "
+                f"tidak tersedia: {missing}."
+            )
+
+    status = RuleStatus.READY if satisfied else RuleStatus.NOT_READY
 
     return RuleEvaluation(
         rule_id=rule.id,
@@ -70,6 +81,7 @@ def _evaluate_rule(
         salience=rule.salience,
         specificity=rule.specificity,
         conclusion=rule.conclusion,
+        connector=rule.connector,
     )
 
 
@@ -115,6 +127,7 @@ def run_forward_chaining(
                         salience=rule.salience,
                         specificity=rule.specificity,
                         conclusion=rule.conclusion,
+                        connector=rule.connector,
                     )
                 )
                 continue
@@ -156,7 +169,7 @@ def run_forward_chaining(
             elif evaluation.status == RuleStatus.READY:
                 evaluation.status = RuleStatus.READY_NOT_SELECTED
                 evaluation.reason = (
-                    f"Siap jalan (semua kondisi TRUE) tetapi kalah conflict "
+                    f"Siap jalan (kondisi IF terpenuhi) tetapi kalah conflict "
                     f"resolution dari {selected.id}."
                 )
 
