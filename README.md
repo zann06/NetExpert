@@ -317,13 +317,11 @@ Struktur dokumen: halaman sampul → ringkasan eksekutif → pendahuluan → bas
 
 ![Pratinjau 9 halaman contoh laporan](assets/screenshots/14-example-report-pages.png)
 
-Halaman sampul menampilkan identitas kelompok dan anggota beserta NIM. Seluruh kolom bersifat opsional — baris yang kosong otomatis disembunyikan.
+Halaman sampul menampilkan identitas kelompok dan anggota beserta NIM. Bagian hasil memuat urutan firing, conflict set per iterasi, kesimpulan, fakta turunan, dan working memory akhir — semuanya dalam tabel hitam-putih. Seluruh kolom metadata bersifat opsional: baris yang kosong otomatis disembunyikan.
 
-![Halaman sampul contoh laporan](assets/screenshots/12-example-report-cover.png)
-
-Bagian hasil memuat urutan firing, conflict set per iterasi, kesimpulan, fakta turunan, dan working memory akhir dalam tabel hitam-putih.
-
-![Bagian hasil forward chaining contoh laporan](assets/screenshots/13-example-report-results.png)
+| Halaman sampul | Hasil forward chaining |
+|---|---|
+| ![Halaman sampul contoh laporan](assets/screenshots/12-example-report-cover.png) | ![Bagian hasil forward chaining contoh laporan](assets/screenshots/13-example-report-results.png) |
 
 > Pratinjau halaman PDF di atas dirender ulang kapan saja dengan `python scripts/make_report_previews.py`.
 
