@@ -70,6 +70,8 @@ def test_report_is_monochrome_and_print_ready():
     assert "#D97706" not in html
     assert "#000000" in html
     assert "Times New Roman" in html
+    assert "@page" in html
+    assert "size: A4" in html
     assert "@media print" in html
 
 

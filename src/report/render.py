@@ -412,6 +412,7 @@ ul.facts li, ul.plain li { margin: 2px 0; }
 .signature .space { height: 64px; }
 .signature .name { font-weight: bold; text-decoration: underline; }
 .note { font-size: 10pt; color: #4b5563; font-style: italic; margin-top: 26px; }
+@page { size: A4; margin: 18mm 16mm; }
 @media print {
   .page { max-width: none; padding: 0 0 18px 0; break-after: page; }
   .page:last-child { break-after: auto; }

@@ -4,6 +4,7 @@
 [![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=zann06/NetExpert&branch=main&mainModule=app.py)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-2563EB)](https://www.python.org/)
 [![Tests](https://img.shields.io/badge/tests-114%20passed-16A34A)](tests/)
+[![Contoh Laporan](https://img.shields.io/badge/Contoh%20Laporan-PDF-111111?logo=adobeacrobatreader&logoColor=white)](assets/examples/laporan-contoh.pdf)
 
 NetExpert adalah aplikasi web edukasi untuk mensimulasikan **sistem pakar berbasis aturan produksi IF–THEN**. Aplikasi ini tidak sekadar menampilkan kesimpulan: seluruh proses penalaran — evaluasi TRUE/FALSE setiap kondisi, conflict set, conflict resolution, refractoriness, dan pohon inferensi — dapat diaudit langkah demi langkah.
 
@@ -47,6 +48,7 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 - Metadata **opsional**: judul, mata kuliah, kelompok, anggota + NIM + peran, dosen, institusi, logo, dan narasi.
 - Layout A4 siap cetak: halaman sampul, bagian bernomor, tabel basis pengetahuan, hasil forward/backward, kesimpulan, dan lampiran jejak evaluasi.
 - Pratinjau langsung di aplikasi serta unduhan **HTML** (siap *Print → Save as PDF*) dan **Markdown**.
+- Contoh laporan jadi: [`assets/examples/laporan-contoh.pdf`](assets/examples/laporan-contoh.pdf) — 9 halaman A4 hitam-putih.
 - Warna dokumen murni hitam-putih agar konsisten saat dicetak.
 
 ### Manajemen pengetahuan
@@ -142,7 +144,9 @@ NetExpert_Documentation/
 ├── .streamlit/
 │   └── config.toml                 # Tema white-first
 ├── assets/
-│   └── screenshots/                # Tangkapan layar untuk README
+│   ├── screenshots/                # Tangkapan layar untuk README
+│   └── examples/
+│       └── laporan-contoh.pdf      # Contoh laporan 9 halaman (A4)
 ├── src/
 │   ├── __init__.py
 │   ├── models.py                   # Rule, trace, node, result models
@@ -304,6 +308,8 @@ Halaman **Laporan** menggabungkan metadata opsional (kelompok, anggota, NIM, dos
 ![Halaman laporan](assets/screenshots/09-report.png)
 
 ### 7.10 Contoh Laporan yang Dihasilkan
+
+**Contoh lengkap (PDF, 9 halaman A4):** [**`laporan-contoh.pdf`**](assets/examples/laporan-contoh.pdf) — dihasilkan dari dataset default dengan urutan firing **R5 → R4 → R1 → R7**.
 
 Halaman sampul menampilkan identitas kelompok dan anggota beserta NIM. Seluruh kolom bersifat opsional — baris yang kosong otomatis disembunyikan.
 
