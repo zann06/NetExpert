@@ -143,6 +143,8 @@ NetExpert_Documentation/
 ├── .gitignore
 ├── .streamlit/
 │   └── config.toml                 # Tema white-first
+├── scripts/
+│   └── make_report_previews.py     # Render ulang pratinjau PDF contoh di README
 ├── assets/
 │   ├── screenshots/                # Tangkapan layar untuk README
 │   └── examples/
@@ -311,13 +313,19 @@ Halaman **Laporan** menggabungkan metadata opsional (kelompok, anggota, NIM, dos
 
 **Contoh lengkap (PDF, 9 halaman A4):** [**`laporan-contoh.pdf`**](assets/examples/laporan-contoh.pdf) — dihasilkan dari dataset default dengan urutan firing **R5 → R4 → R1 → R7**.
 
+Struktur dokumen: halaman sampul → ringkasan eksekutif → pendahuluan → basis pengetahuan dan fakta awal → hasil forward chaining → kesimpulan dan rekomendasi → lampiran jejak evaluasi lengkap. Pratinjau keseluruhan halaman:
+
+![Pratinjau 9 halaman contoh laporan](assets/screenshots/14-example-report-pages.png)
+
 Halaman sampul menampilkan identitas kelompok dan anggota beserta NIM. Seluruh kolom bersifat opsional — baris yang kosong otomatis disembunyikan.
 
-![Contoh halaman sampul laporan](assets/screenshots/10-report-cover.png)
+![Halaman sampul contoh laporan](assets/screenshots/12-example-report-cover.png)
 
 Bagian hasil memuat urutan firing, conflict set per iterasi, kesimpulan, fakta turunan, dan working memory akhir dalam tabel hitam-putih.
 
-![Contoh bagian hasil laporan](assets/screenshots/11-report-results.png)
+![Bagian hasil forward chaining contoh laporan](assets/screenshots/13-example-report-results.png)
+
+> Pratinjau halaman PDF di atas dirender ulang kapan saja dengan `python scripts/make_report_previews.py`.
 
 Cuplikan Markdown yang dihasilkan (format unduhan `.md`):
 
