@@ -19,6 +19,7 @@ PAGES = [
     "Knowledge Base",
     "Inference Tree",
     "Laporan",
+    "Feedback",
     "Guide",
 ]
 

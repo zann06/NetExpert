@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-netexpert.streamlit.app-16A34A?logo=streamlit&logoColor=white)](https://netexpert.streamlit.app/)
 [![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=zann06/NetExpert&branch=main&mainModule=app.py)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-2563EB)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-114%20passed-16A34A)](tests/)
+[![Tests](https://img.shields.io/badge/tests-133%20passed-16A34A)](tests/)
 [![Contoh Laporan](https://img.shields.io/badge/Contoh%20Laporan-PDF-111111?logo=adobeacrobatreader&logoColor=white)](assets/examples/laporan-contoh.pdf)
 
 NetExpert adalah aplikasi web edukasi untuk mensimulasikan **sistem pakar berbasis aturan produksi IF–THEN**. Aplikasi ini tidak sekadar menampilkan kesimpulan: seluruh proses penalaran — evaluasi TRUE/FALSE setiap kondisi, conflict set, conflict resolution, refractoriness, dan pohon inferensi — dapat diaudit langkah demi langkah.
@@ -59,11 +59,18 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 - Manajemen fakta awal: pilih dari katalog, tambah fakta manual, hapus, kosongkan, atau muat ulang fakta default.
 - Reset seluruh aplikasi ke dataset tugas.
 
+### Feedback jawaban
+- Halaman **Feedback**: tempel jawaban tugas (mis. hasil diskusi dengan AI) dan aplikasi memeriksa setiap iterasi terhadap jejak engine — **deterministik, tanpa AI/LLM**.
+- Dua mode input: **tempel jawaban bebas** (tabel markdown, baris `Iterasi 1: ...`, daftar bernomor) atau **form terstruktur** per iterasi.
+- Pemeriksaan mencakup conflict set, aturan terpilih, dan kesimpulan per iterasi, plus iterasi yang hilang/berlebih dan klaim STOP.
+- Setiap langkah keliru diberi penjelasan yang mengutip kriteria konkret: nilai salience, jumlah kondisi (spesifisitas), nomor aturan, atau refractoriness.
+- Skor deterministik (jumlah field cocok / total field); jawaban benar setelah KB dimodifikasi akan dinilai terhadap KB baru, bukan dataset hardcoded.
+
 ### Antarmuka
 - Tema **white-first** yang profesional: `#FFFFFF`, surface `#F8FAFC`, border `#E2E8F0`, aksen `#2563EB`.
 - Warna semantik: hijau TRUE/PROVEN, merah FALSE/UNPROVEN, amber READY/evaluating, abu-abu refractory.
 - Layout responsif, kartu minimalis, tabel rapi, tipografi Inter dengan fallback sistem.
-- Enam halaman: Overview, Diagnosis, Knowledge Base, Inference Tree, Laporan, Guide.
+- Tujuh halaman: Overview, Diagnosis, Knowledge Base, Inference Tree, Laporan, Feedback, Guide.
 
 ---
 
@@ -169,6 +176,11 @@ NetExpert_Documentation/
 │   │   ├── __init__.py
 │   │   ├── models.py               # Optional report metadata (group, NIM, ...)
 │   │   └── render.py               # Monochrome HTML + Markdown report renderer
+│   ├── feedback/
+│   │   ├── __init__.py
+│   │   ├── models.py               # Submitted iterations + feedback report
+│   │   ├── parser.py               # Parse pasted answers (tables / free lines)
+│   │   └── checker.py              # Deterministic comparison vs engine trace
 │   └── ui/
 │       ├── __init__.py
 │       ├── styles.py               # Global white-first CSS
@@ -181,6 +193,7 @@ NetExpert_Documentation/
 │           ├── knowledge_base.py
 │           ├── tree.py
 │           ├── report.py           # Report builder + live preview + downloads
+│           ├── feedback.py         # Answer checker (paste answer / form)
 │           └── guide.py
 └── tests/
     ├── conftest.py
@@ -192,7 +205,8 @@ NetExpert_Documentation/
     ├── test_tree.py
     ├── test_or_rules.py
     ├── test_interactive_graph.py
-    └── test_report.py
+    ├── test_report.py
+    └── test_feedback.py
 ```
 
 ---
@@ -396,7 +410,14 @@ _Sistem Pakar Berbasis Aturan Produksi untuk Diagnosis Gangguan Internet_
 ### F. Reset
 Gunakan **Reset ke dataset tugas** pada sidebar, centang konfirmasi, lalu tekan **Reset sekarang**. Seluruh aturan, fakta, dan hasil inferensi kembali ke kondisi awal.
 
-### G. Membuat laporan
+### G. Memeriksa jawaban tugas (Feedback)
+1. Buka halaman **Feedback** (tidak perlu menjalankan inferensi dulu — pemeriksaan memakai dataset saat ini).
+2. Tab **Tempel Jawaban**: tempel jawaban soal forward chaining dalam format bebas — tabel markdown, baris `Iterasi 1: ...`, atau daftar bernomor — lalu tekan **Periksa jawaban**.
+3. Tab **Form Terstruktur**: alternatifnya, isi conflict set / aturan terpilih / kesimpulan per iterasi langsung di form.
+4. Aplikasi menampilkan skor, tabel perbandingan *jawaban vs engine* per aspek, dan penjelasan setiap langkah keliru (salience, spesifisitas, nomor aturan, atau refractoriness).
+5. Pemeriksaan **bukan AI**: engine dijalankan ulang pada dataset aktif, sehingga jawaban dinilai terhadap knowledge base terkini.
+
+### H. Membuat laporan
 1. Jalankan **forward chaining** atau **backward chaining** terlebih dahulu.
 2. Buka halaman **Laporan**.
 3. Isi identitas yang diperlukan — semuanya opsional: judul, mata kuliah, kelompok, anggota + NIM + peran, dosen, institusi, logo, dan narasi.
@@ -411,7 +432,7 @@ Gunakan **Reset ke dataset tugas** pada sidebar, centang konfirmasi, lalu tekan 
 python -m pytest -q
 ```
 
-Hasil aktual: **114 passed**.
+Hasil aktual: **133 passed**.
 
 Cakupan pengujian:
 - Default forward chaining dan urutan firing `R5 → R4 → R1 → R7`.
@@ -429,4 +450,5 @@ Cakupan pengujian:
 - Validasi rule, ID duplikat, CRUD knowledge base.
 - Konsistensi trace dengan inference tree, filter tree, dan adapter graph interaktif.
 - Render laporan: struktur bagian, palet monokrom, escaping input, metadata opsional, logo, konsistensi trace, dan tabel Markdown.
+- Feedback: parser jawaban (tabel markdown, baris berlabel, daftar bernomor, normalisasi ID aturan, jawaban kosong/tidak valid), checker deterministik (jawaban benar 100%, aturan terpilih keliru dengan kutipan salience, conflict set kurang, iterasi hilang/berlebih/duplikat, kesimpulan keliru dengan kutipan THEN, refractoriness, skor deterministik, severity, jawaban parsial tanpa crash, dan checker mengikuti KB yang dimodifikasi).
 
