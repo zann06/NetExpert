@@ -48,6 +48,10 @@ def render() -> None:
     with tab_form:
         _render_form_tab()
 
+    error = st.session_state.get("feedback_error")
+    if error:
+        st.error(error)
+
     report = st.session_state.get("feedback_report")
     if report is not None:
         _render_report(report)
@@ -230,10 +234,10 @@ def _render_report(report) -> None:
             rows.append(
                 {
                     "Iterasi": entry["iteration"],
-                    "Aspek": _FIELD_LABELS.get(check["field"], check["field"]),
-                    "Jawaban": check["claim"],
-                    "Engine": check["expected"],
-                    "Status": "✓ Benar" if check["ok"] else "✗ Keliru",
+                    "Aspek": _FIELD_LABELS.get(check.field, check.field),
+                    "Jawaban": check.claim,
+                    "Engine": check.expected,
+                    "Status": "✓ Benar" if check.ok else "✗ Keliru",
                 }
             )
     if rows:

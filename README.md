@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-netexpert.streamlit.app-16A34A?logo=streamlit&logoColor=white)](https://netexpert.streamlit.app/)
 [![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=zann06/NetExpert&branch=main&mainModule=app.py)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-2563EB)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-133%20passed-16A34A)](tests/)
+[![Tests](https://img.shields.io/badge/tests-139%20passed-16A34A)](tests/)
 [![Contoh Laporan](https://img.shields.io/badge/Contoh%20Laporan-PDF-111111?logo=adobeacrobatreader&logoColor=white)](assets/examples/laporan-contoh.pdf)
 
 NetExpert adalah aplikasi web edukasi untuk mensimulasikan **sistem pakar berbasis aturan produksi IF–THEN**. Aplikasi ini tidak sekadar menampilkan kesimpulan: seluruh proses penalaran — evaluasi TRUE/FALSE setiap kondisi, conflict set, conflict resolution, refractoriness, dan pohon inferensi — dapat diaudit langkah demi langkah.
@@ -206,7 +206,8 @@ NetExpert_Documentation/
     ├── test_or_rules.py
     ├── test_interactive_graph.py
     ├── test_report.py
-    └── test_feedback.py
+    ├── test_feedback.py
+    └── test_feedback_page.py
 ```
 
 ---
@@ -432,7 +433,7 @@ Gunakan **Reset ke dataset tugas** pada sidebar, centang konfirmasi, lalu tekan 
 python -m pytest -q
 ```
 
-Hasil aktual: **133 passed**.
+Hasil aktual: **139 passed**.
 
 Cakupan pengujian:
 - Default forward chaining dan urutan firing `R5 → R4 → R1 → R7`.
@@ -451,4 +452,3 @@ Cakupan pengujian:
 - Konsistensi trace dengan inference tree, filter tree, dan adapter graph interaktif.
 - Render laporan: struktur bagian, palet monokrom, escaping input, metadata opsional, logo, konsistensi trace, dan tabel Markdown.
 - Feedback: parser jawaban (tabel markdown, baris berlabel, daftar bernomor, normalisasi ID aturan, jawaban kosong/tidak valid), checker deterministik (jawaban benar 100%, aturan terpilih keliru dengan kutipan salience, conflict set kurang, iterasi hilang/berlebih/duplikat, kesimpulan keliru dengan kutipan THEN, refractoriness, skor deterministik, severity, jawaban parsial tanpa crash, dan checker mengikuti KB yang dimodifikasi).
-
