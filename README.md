@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-netexpert.streamlit.app-16A34A?logo=streamlit&logoColor=white)](https://netexpert.streamlit.app/)
 [![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=zann06/NetExpert&branch=main&mainModule=app.py)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-2563EB)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-102%20passed-16A34A)](tests/)
+[![Tests](https://img.shields.io/badge/tests-114%20passed-16A34A)](tests/)
 
 NetExpert adalah aplikasi web edukasi untuk mensimulasikan **sistem pakar berbasis aturan produksi IF–THEN**. Aplikasi ini tidak sekadar menampilkan kesimpulan: seluruh proses penalaran — evaluasi TRUE/FALSE setiap kondisi, conflict set, conflict resolution, refractoriness, dan pohon inferensi — dapat diaudit langkah demi langkah.
 
@@ -42,6 +42,13 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 - Tabel alternatif yang aksesibel dan inspector node tetap tersedia sebagai fallback teks.
 - Unduh graph dalam format `.dot`.
 
+### Laporan
+- Halaman **Laporan** menyusun dokumen profesional hitam-putih dari hasil diagnosis aktif.
+- Metadata **opsional**: judul, mata kuliah, kelompok, anggota + NIM + peran, dosen, institusi, logo, dan narasi.
+- Layout A4 siap cetak: halaman sampul, bagian bernomor, tabel basis pengetahuan, hasil forward/backward, kesimpulan, dan lampiran jejak evaluasi.
+- Pratinjau langsung di aplikasi serta unduhan **HTML** (siap *Print → Save as PDF*) dan **Markdown**.
+- Warna dokumen murni hitam-putih agar konsisten saat dicetak.
+
 ### Manajemen pengetahuan
 - CRUD aturan produksi: tambah, edit ID/kondisi/kesimpulan/salience, hapus dengan konfirmasi.
 - **Pemilihan operator AND atau OR** saat menambah/mengedit aturan.
@@ -54,7 +61,7 @@ Aplikasi dibangun dengan **Python + Streamlit**. Inference engine terpisah sepen
 - Tema **white-first** yang profesional: `#FFFFFF`, surface `#F8FAFC`, border `#E2E8F0`, aksen `#2563EB`.
 - Warna semantik: hijau TRUE/PROVEN, merah FALSE/UNPROVEN, amber READY/evaluating, abu-abu refractory.
 - Layout responsif, kartu minimalis, tabel rapi, tipografi Inter dengan fallback sistem.
-- Lima halaman: Overview, Diagnosis, Knowledge Base, Inference Tree, Guide.
+- Enam halaman: Overview, Diagnosis, Knowledge Base, Inference Tree, Laporan, Guide.
 
 ---
 
@@ -152,6 +159,10 @@ NetExpert_Documentation/
 │   │   ├── __init__.py
 │   │   ├── inference_tree.py       # Dynamic DOT + accessible tables
 │   │   └── interactive_graph.py    # Clickable Cytoscape elements + styles
+│   ├── report/
+│   │   ├── __init__.py
+│   │   ├── models.py               # Optional report metadata (group, NIM, ...)
+│   │   └── render.py               # Monochrome HTML + Markdown report renderer
 │   └── ui/
 │       ├── __init__.py
 │       ├── styles.py               # Global white-first CSS
@@ -163,6 +174,7 @@ NetExpert_Documentation/
 │           ├── diagnosis.py
 │           ├── knowledge_base.py
 │           ├── tree.py
+│           ├── report.py           # Report builder + live preview + downloads
 │           └── guide.py
 └── tests/
     ├── conftest.py
@@ -173,7 +185,8 @@ NetExpert_Documentation/
     ├── test_backward_chaining.py
     ├── test_tree.py
     ├── test_or_rules.py
-    └── test_interactive_graph.py
+    ├── test_interactive_graph.py
+    └── test_report.py
 ```
 
 ---
@@ -226,7 +239,7 @@ python -m streamlit run app.py --server.port 8501
 
 ## 7. Tangkapan Layar & Alur Kerja
 
-Alur pemakaian: **Overview → Diagnosis → Hasil → Inference Tree → Knowledge Base → Guide**.
+Alur pemakaian: **Overview → Diagnosis → Hasil → Inference Tree → Laporan → Knowledge Base → Guide**.
 
 ### 7.1 Overview
 
@@ -284,6 +297,52 @@ Penjelasan konsep forward/backward chaining, conflict resolution, dan refractori
 
 ![Halaman guide](assets/screenshots/06-guide.png)
 
+### 7.9 Laporan Profesional
+
+Halaman **Laporan** menggabungkan metadata opsional (kelompok, anggota, NIM, dosen, institusi, logo) dengan hasil inferensi aktif. Pratinjau dokumen hitam-putih tampil langsung di samping formulir, dan laporan dapat diunduh sebagai HTML siap cetak atau Markdown.
+
+![Halaman laporan](assets/screenshots/09-report.png)
+
+### 7.10 Contoh Laporan yang Dihasilkan
+
+Halaman sampul menampilkan identitas kelompok dan anggota beserta NIM. Seluruh kolom bersifat opsional — baris yang kosong otomatis disembunyikan.
+
+![Contoh halaman sampul laporan](assets/screenshots/10-report-cover.png)
+
+Bagian hasil memuat urutan firing, conflict set per iterasi, kesimpulan, fakta turunan, dan working memory akhir dalam tabel hitam-putih.
+
+![Contoh bagian hasil laporan](assets/screenshots/11-report-results.png)
+
+Cuplikan Markdown yang dihasilkan (format unduhan `.md`):
+
+```markdown
+# Laporan Hasil Diagnosis Gangguan Internet
+
+_Sistem Pakar Berbasis Aturan Produksi untuk Diagnosis Gangguan Internet_
+
+**Universitas Contoh**
+
+- **Mata Kuliah:** Sistem Pakar
+- **Kelompok:** Kelompok 4 (04)
+- **Dosen Pengampu:** Dr. Nama Dosen, M.Kom.
+- **Anggota Kelompok:**
+    - Budi Santoso — NIM 21.11.0001 — Ketua
+    - Ani Lestari — NIM 21.11.0002 — Anggota
+    - Citra Dewi — NIM 21.11.0003 — Anggota
+
+## 1. Ringkasan Eksekutif
+...
+## 4. Hasil Forward Chaining
+
+| Iterasi | Conflict Set | Aturan Terpilih | Kesimpulan | Ditambahkan ke WM |
+| --- | --- | --- | --- | --- |
+| 1 | R5, R1 | R5 | Gangguan Provider | Ya |
+| 2 | R4, R1, R7 | R4 | Lapor ke Provider | Ya |
+| 3 | R1, R7 | R1 | Cek Router | Ya |
+| 4 | R7 | R7 | Gunakan Tethering Sementara | Ya |
+| 5 | — | STOP | — | — |
+```
+
 ---
 
 ## 8. Cara Menggunakan
@@ -325,6 +384,13 @@ Penjelasan konsep forward/backward chaining, conflict resolution, dan refractori
 ### F. Reset
 Gunakan **Reset ke dataset tugas** pada sidebar, centang konfirmasi, lalu tekan **Reset sekarang**. Seluruh aturan, fakta, dan hasil inferensi kembali ke kondisi awal.
 
+### G. Membuat laporan
+1. Jalankan **forward chaining** atau **backward chaining** terlebih dahulu.
+2. Buka halaman **Laporan**.
+3. Isi identitas yang diperlukan — semuanya opsional: judul, mata kuliah, kelompok, anggota + NIM + peran, dosen, institusi, logo, dan narasi.
+4. Periksa pratinjau dokumen hitam-putih di panel kanan.
+5. Unduh **`.html`** lalu buka di browser → **Ctrl/Cmd + P** → **Save as PDF**, atau unduh **`.md`** untuk disalin ke dokumen lain.
+
 ---
 
 ## 9. Testing
@@ -333,7 +399,7 @@ Gunakan **Reset ke dataset tugas** pada sidebar, centang konfirmasi, lalu tekan 
 python -m pytest -q
 ```
 
-Hasil aktual: **102 passed**.
+Hasil aktual: **114 passed**.
 
 Cakupan pengujian:
 - Default forward chaining dan urutan firing `R5 → R4 → R1 → R7`.
@@ -350,4 +416,5 @@ Cakupan pengujian:
 - Deteksi siklus.
 - Validasi rule, ID duplikat, CRUD knowledge base.
 - Konsistensi trace dengan inference tree, filter tree, dan adapter graph interaktif.
+- Render laporan: struktur bagian, palet monokrom, escaping input, metadata opsional, logo, konsistensi trace, dan tabel Markdown.
 

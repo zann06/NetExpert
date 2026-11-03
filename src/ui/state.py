@@ -18,6 +18,7 @@ PAGES = [
     "Diagnosis",
     "Knowledge Base",
     "Inference Tree",
+    "Laporan",
     "Guide",
 ]
 

@@ -13,7 +13,7 @@ from __future__ import annotations
 import streamlit as st
 
 from src.ui import components as c
-from src.ui.pages import diagnosis, guide, knowledge_base, overview, tree
+from src.ui.pages import diagnosis, guide, knowledge_base, overview, report, tree
 from src.ui.state import PAGES, init_state, navigate, reset_application
 from src.ui.styles import inject_styles
 
@@ -31,6 +31,7 @@ RENDERERS = {
     "Diagnosis": diagnosis.render,
     "Knowledge Base": knowledge_base.render,
     "Inference Tree": tree.render,
+    "Laporan": report.render,
     "Guide": guide.render,
 }
 
