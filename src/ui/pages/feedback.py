@@ -56,6 +56,18 @@ def render() -> None:
 # ---------------------------------------------------------------------------
 # Input tabs
 # ---------------------------------------------------------------------------
+def _fill_sample_answer() -> None:
+    """Callback: runs before the next rerun, so the text_area key is safe to set."""
+    st.session_state.feedback_answer_text = _SAMPLE_ANSWER
+
+
+def _add_form_row() -> None:
+    """Callback: append one structured-form row (max 12)."""
+    current = st.session_state.get("feedback_form_rows", 5)
+    if current < 12:
+        st.session_state.feedback_form_rows = current + 1
+
+
 def _render_paste_tab() -> None:
     st.text_area(
         "Jawaban soal (a) — forward chaining",
@@ -78,9 +90,11 @@ def _render_paste_tab() -> None:
         ):
             _run_check(text=st.session_state.feedback_answer_text)
     with columns[1]:
-        if st.button("Isi contoh jawaban", width="stretch"):
-            st.session_state.feedback_answer_text = _SAMPLE_ANSWER
-            st.rerun()
+        st.button(
+            "Isi contoh jawaban",
+            width="stretch",
+            on_click=_fill_sample_answer,
+        )
 
 
 def _render_form_tab() -> None:
@@ -130,12 +144,12 @@ def _render_form_tab() -> None:
 
     below = st.columns([1, 3])
     with below[0]:
-        if st.button(
-            "+ Baris", width="stretch",
+        st.button(
+            "+ Baris",
+            width="stretch",
             disabled=rows >= 12,
-        ):
-            st.session_state.feedback_form_rows = rows + 1
-            st.rerun()
+            on_click=_add_form_row,
+        )
 
     if st.button("Periksa form", type="primary"):
         lines = []
